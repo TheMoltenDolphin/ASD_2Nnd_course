@@ -25,7 +25,6 @@ void selSort(std::vector<int>& arr)
 
     return;
 }
-
 int main()
 {
 
