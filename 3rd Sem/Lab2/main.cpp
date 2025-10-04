@@ -52,7 +52,10 @@ std::queue<char> EvaluatedExpr(std::string inp)
     std::stack<char> s;
     for(int i = 0; i < inp.size(); i++)
     {
-        if(isdigit(inp[i]))
+
+        if(inp[i] == '(')
+            s.push(inp[i]);
+        else if(isdigit(inp[i]))
         {
             q.push(inp[i]);
             continue;
@@ -65,7 +68,7 @@ std::queue<char> EvaluatedExpr(std::string inp)
                 s.push(inp[i]);
             else
             {
-                while(Priority(inp[i]) < Priority(s.top()) && s.top() != '(')
+                while(Priority(inp[i]) <= Priority(s.top()) && s.top() != '(')
                 {
                     q.push(s.top());
                     s.pop();
@@ -75,14 +78,14 @@ std::queue<char> EvaluatedExpr(std::string inp)
                 s.push(inp[i]);
             }
         }
-        else if(inp[i] == '(')
-            s.push(inp[i]);
         else
         {
             while(s.top() != '(')
             {
                 q.push(s.top());
                 s.pop();
+                if(s.empty())
+                    break;
             }
             s.pop();
         }
@@ -125,7 +128,7 @@ int main()
     std::string inp;
     //std::cin >> inp;
 
-    inp = "8+4*(7+2)/5+6*3-1+(9-4)*2/8+7*2-5=";
+    inp = "8+4*(7-2)/5+6*3-1+(9-4)*2/8+7*2-5=";
 
     if(inp.back() == '=')
     {
