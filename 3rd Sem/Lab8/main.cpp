@@ -72,7 +72,6 @@ void RadixSort(std::vector<int>& arr)
             {
                 for(int j = 0; j < bit[k].size(); j++)
                 {
-                    std::cout << "!@#123";
                     arr.push_back(bit[k][j]);
                 }
                 bit[k].clear();
