@@ -22,7 +22,7 @@ int main()
             for(int l = 0; l < n + 1; l++)
             {
                 if(pow(3, i) * pow(5, j) * pow(7, l) > x)
-                    break;
+                    continue;
                 std::cout << pow(3, i) * pow(5, j) * pow(7, l) << std::endl;
             }
 

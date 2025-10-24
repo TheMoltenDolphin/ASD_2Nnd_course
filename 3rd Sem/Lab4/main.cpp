@@ -6,7 +6,7 @@
 void combSort(std::vector<int>& arr) {
     size_t len = arr.size();
     size_t gap = len / 1.247f;
-    while(gap > 1)
+    while(gap >= 1)
     {
         for(int i = 0; i < len-gap; i += 1)
             if(arr[i] > arr[i+gap])

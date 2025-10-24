@@ -33,15 +33,18 @@ bool CheckExpression(std::string inp)
     {
         if(validChars.find(i) == std::string::npos)
             return false;
-        else if(i != '(' || i != ')')
+
+        else if(i != '(' && i != ')')
             continue;
-        else if(i == ')' && s.top() == '(')
+        else if(!s.empty() && i == ')' && s.top() == '(')
             s.pop();
         else
             s.push(i);
     }
+
     if(s.empty())
         return true;
+        
     return false;
 }
 
@@ -62,6 +65,13 @@ std::queue<char> EvaluatedExpr(std::string inp)
         }
         else if (op.find(inp[i]) != std::string::npos)
         {
+            if(inp[i] == '/' && inp[i+1] == '0')
+            {
+                std::cerr << "Ошибка: Деление на ноль!" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+
+            
             if(s.empty() || s.top() == '(')
                 s.push(inp[i]);
             else if(Priority(inp[i]) > Priority(s.top()))
@@ -136,13 +146,14 @@ int main()
         if(!CheckExpression(inp))
         {
             std::cerr << "Выражение составлено неправильно!";
-            return -1;
+            exit(EXIT_FAILURE);
         }
+        std::cout << "Выражение составлено правильно!" << std::endl;
     }
     else
     {
         std::cerr << "Выражение составлено неправильно!";
-        return -1;
+        exit(EXIT_FAILURE);
     }
 
     std::queue<char> PostExpr = EvaluatedExpr(inp);
