@@ -1,38 +1,52 @@
 #include <iostream>
-#include <windows.h>
-#include <string>
 #include <stack>
-#include <queue>
+#include <string>
+#include <cctype>
+#include <stdexcept>
 
+bool isOperator(char c) {
+    return c == '+' || c == '-' || c == '*' || c == '/';
+}
 
-float Calculate(float x1, float x2, char t)
-{
-    switch (t)
-    {
-        case '+':
-            return x1 + x2;
-        case '-':
-            return x1 - x2;
-        case '*':
-            return x1 * x2;
+int getPriority(char op) {
+    if (op == '*' || op == '/') return 2;
+    if (op == '+' || op == '-') return 1;
+    return 0;
+}
+
+float applyOperation(float a, float b, char op) {
+    switch (op) {
+        case '+': return a + b;
+        case '-': return a - b;
+        case '*': return a * b;
         case '/':
-            return x1 / x2;
+            if (b == 0)
+            {
+                std::cerr << "Деление на ноль" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            return a / b;
+        default: return 0;
     }
 }
 
-int Priority(char inp)
-{
-    return ((inp == '+' || inp == '-') ? 1 : 2);
-}
 
-bool CheckExpression(std::string inp)
+bool validate(std::string inp)
 {
+    inp.pop_back();
+
     std::string validChars = "1234567890*-+/()";
     std::stack<char> s;
     for(char i : inp)
     {
         if(validChars.find(i) == std::string::npos)
             return false;
+
+        if(s.empty() && (i == ')' || i == '('))
+        {
+            s.push(i);
+            continue;
+        }
 
         else if(i != '(' && i != ')')
             continue;
@@ -42,131 +56,67 @@ bool CheckExpression(std::string inp)
             s.push(i);
     }
 
-    if(s.empty())
-        return true;
-        
-    return false;
+    return s.empty();
 }
 
-std::queue<char> EvaluatedExpr(std::string inp)
-{
-    std::string op = "+-*/";
-    std::queue<char> q;
-    std::stack<char> s;
-    for(int i = 0; i < inp.size(); i++)
+float evaluate(std::string inp) {
+    if (!validate(inp))
     {
-
-        if(inp[i] == '(')
-            s.push(inp[i]);
-        else if(isdigit(inp[i]))
-        {
-            q.push(inp[i]);
-            continue;
-        }
-        else if (op.find(inp[i]) != std::string::npos)
-        {
-            if(inp[i] == '/' && inp[i+1] == '0')
-            {
-                std::cerr << "Ошибка: Деление на ноль!" << std::endl;
-                exit(EXIT_FAILURE);
-            }
-
-            
-            if(s.empty() || s.top() == '(')
-                s.push(inp[i]);
-            else if(Priority(inp[i]) > Priority(s.top()))
-                s.push(inp[i]);
-            else
-            {
-                while(Priority(inp[i]) <= Priority(s.top()) && s.top() != '(')
-                {
-                    q.push(s.top());
-                    s.pop();
-                    if(s.empty())
-                        break;
-                }
-                s.push(inp[i]);
-            }
-        }
-        else
-        {
-            while(s.top() != '(')
-            {
-                q.push(s.top());
-                s.pop();
-                if(s.empty())
-                    break;
-            }
-            s.pop();
-        }
-    }
-    while(!s.empty())
-    {
-        q.push(s.top());
-        s.pop();
-    }
-
-    return q;
-}
-
-float EvaluateExpression(std::queue<char> q)
-{
-    std::stack<float> s;
-    while (!q.empty())
-    {
-        char token = q.front();
-        q.pop();
-        if (isdigit(token))
-        {
-            s.push(token - '0');
-        }
-        else
-        {
-            float right = s.top(); s.pop();
-            float left = s.top(); s.pop();
-            float result = Calculate(left, right, token);
-            s.push(result);
-        }
-    }
-    return s.top();
-}
-
-int main()
-{
-    SetConsoleOutputCP(65001);
-    SetConsoleCP(65001);
-    std::string inp;
-    //std::cin >> inp;
-
-    inp = "8+4*(7-2)/5+6*3-1+(9-4)*2/8+7*2-5=";
-
-    if(inp.back() == '=')
-    {
-        inp.pop_back();
-        if(!CheckExpression(inp))
-        {
-            std::cerr << "Выражение составлено неправильно!";
-            exit(EXIT_FAILURE);
-        }
-        std::cout << "Выражение составлено правильно!" << std::endl;
-    }
-    else
-    {
-        std::cerr << "Выражение составлено неправильно!";
+        std::cerr << "Некорректное выражение" << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    std::queue<char> PostExpr = EvaluatedExpr(inp);
+    std::stack<float> values;
+    std::stack<char> ops;
 
-    float res = EvaluateExpression(PostExpr);
-
-    while (!PostExpr.empty())  // пока очередь не пуста
-    {
-        std::cout << PostExpr.front() << ' ';
-        PostExpr.pop();    // извлекаем первый элемент
+    for (size_t i = 0; i < inp.length(); i++) {
+        
+        if (inp[i] == '(') {
+            ops.push(inp[i]);
+        }
+        else if (isdigit(inp[i])) {
+            float val = 0;
+            while (i < inp.length() && isdigit(inp[i])) {
+                val = val * 10 + (inp[i] - '0');
+                i++;
+            }
+            i--;
+            values.push(val);
+        }
+        else if (inp[i] == ')') {
+            while (!ops.empty() && ops.top() != '(') {
+                float val2 = values.top(); values.pop();
+                float val1 = values.top(); values.pop();
+                char op = ops.top(); ops.pop();
+                values.push(applyOperation(val1, val2, op));
+            }
+            if (!ops.empty()) ops.pop();
+        }
+        else if (isOperator(inp[i])) {
+            while (!ops.empty() && getPriority(ops.top()) >= getPriority(inp[i])) {
+                float val2 = values.top(); values.pop();
+                float val1 = values.top(); values.pop();
+                char op = ops.top(); ops.pop();
+                values.push(applyOperation(val1, val2, op));
+            }
+            ops.push(inp[i]);
+        }
     }
 
-    std::cout << std::endl << res << std::endl;
+    while (!ops.empty()) {
+        float val2 = values.top(); values.pop();
+        float val1 = values.top(); values.pop();
+        char op = ops.top(); ops.pop();
+        values.push(applyOperation(val1, val2, op));
+    }
 
+    return values.top();
+}
+
+int main() {
+
+    std::string expr = "8+4*(7-2)/5+6*3-1+(9-4)*2/(5*4-5)+7*2-5=";
+    float result = evaluate(expr);
+    std::cout << "Результат " << result << std::endl;
     return 0;
 }
