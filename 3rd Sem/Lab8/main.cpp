@@ -4,17 +4,6 @@
 #include <random>
 
 
-std::vector<int> generateRandomVector(int length) {
-    std::vector<int> vec(length);
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(-pow(10, 4), pow(10, 4));
-    for (int& x : vec)
-        x = dis(gen);
-    return vec;
-}
-
-
 void RadixSort(std::vector<int>& arr)
 {
     std::vector<int> negatives, positives;
@@ -102,7 +91,7 @@ int main()
     SetConsoleOutputCP(65001);
     SetConsoleCP(65001);
 
-    std::vector<int> arr = generateRandomVector(10);
+    std::vector<int> arr = { 5, 2, 9, 1, 5, 6, 3, 4, 8, 7, 0, 10, 11, 12, 13, 25, 14, 55, 99, 100, 42, 20, 15, 30, 18, 17};
     arr.push_back(0);
 
     for(int i = 0; i < 10; i++)
