@@ -64,11 +64,15 @@ void SortChunkFiles() {
 
 
 void cleanUpTempFiles() {
-    size_t fileIndex = 0;
+    size_t fileIndex = 1;
     while(true) {
         std::string fileName = "chunk_" + std::to_string(fileIndex++) + ".txt";
-        if (std::remove(fileName.c_str()) != 0) {
+        if (!std::ifstream(fileName).good()) {
+            std::cout << fileIndex;
             break;
+        }
+        else {
+            std::remove(fileName.c_str());
         }
     }
 }
