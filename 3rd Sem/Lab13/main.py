@@ -20,24 +20,6 @@ class HashTable:
             if bucket: 
                 print(f"Индекс {i}: {bucket}")
 
-    def save_to_file(self, filename):
-
-        try:
-            with open(filename, 'w', encoding='utf-8') as f:
-                f.write(f"Хеш-Таблица ({self.size}) \n")
-                
-                for i, bucket in enumerate(self.table):
-                    if bucket:
-                        bucket_str = ", ".join(bucket)
-                        f.write(f"{i}: [{bucket_str}]\n")
-                        
-            print(f"Таблица успешно сохранена в '{filename}'.")
-        
-        except IOError as e:
-            print(f"Ошибка при записи в файл '{filename}': {e}")
-        except Exception as e:
-            print(f"ошибка при сохранении: {e}")
-
 
 def clean_word(word):
     word = word.lower()
@@ -66,15 +48,13 @@ def process_file_to_hashtable(filename, table_size):
 if __name__ == "__main__":
     FILENAME = "input.txt"
     TABLE_SIZE = 5 
-    OUTPUT_FILENAME = "output.txt"
     
     print(f"файл '{FILENAME}' с таблицей размера {TABLE_SIZE}...")
     
     my_table = process_file_to_hashtable(FILENAME, TABLE_SIZE)
     
-    my_table.insert("example_of_insert")
+    my_table.insert("ПЕНИС")
     
 
     if my_table:
         my_table.print_table()
-        my_table.save_to_file(OUTPUT_FILENAME)
