@@ -32,6 +32,7 @@ void splitFileIntoChunks(const std::string& inputFileName, size_t chunkSize) {
             tmp.clear();
         }
     }
+
     inputFile.close();
 }
 
@@ -63,15 +64,11 @@ void SortChunkFiles() {
 
 
 void cleanUpTempFiles() {
-    size_t fileIndex = 1;
+    size_t fileIndex = 0;
     while(true) {
         std::string fileName = "chunk_" + std::to_string(fileIndex++) + ".txt";
-        if (!std::ifstream(fileName).good()) {
-            std::cout << fileIndex;
+        if (std::remove(fileName.c_str()) != 0) {
             break;
-        }
-        else {
-            std::remove(fileName.c_str());
         }
     }
 }
@@ -162,6 +159,7 @@ void mergeFiles(const std::string& inputFile1, const std::string& inputFile2, co
     std::ifstream in1(inputFile1);
     std::ifstream in2(inputFile2);
     std::ofstream out(outputFile);
+
     if (!in1.is_open() || !in2.is_open() || !out.is_open()) {
         std::cerr << "Ошибка открытия файла!" << std::endl;
         return;
@@ -206,6 +204,7 @@ std::string externalMergeSort(const std::vector<std::string>& initialFiles) {
     if (initialFiles.empty()) {
         return "error_empty_list.txt";
     }
+    
     std::queue<std::string> fileQueue;
     for (const std::string& file : initialFiles) {
         fileQueue.push(file);
