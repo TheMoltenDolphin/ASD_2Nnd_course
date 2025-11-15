@@ -27,12 +27,12 @@ def build_tree(s):
     
     balance = 0
     split_idx = -1
-    for j, char in enumerate(s):
-        if char == '(': 
+    for j in range(len(s)):
+        if s[j] == '(': 
             balance += 1
-        elif char == ')': 
+        elif s[j] == ')': 
             balance -= 1
-        elif char == ',' and balance == 0:
+        elif s[j] == ',' and balance == 0:
             split_idx = j
             break
     
