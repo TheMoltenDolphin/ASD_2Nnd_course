@@ -148,7 +148,7 @@ def int_input(prompt):
         try:
             return int(input(prompt))
         except ValueError:
-            print("🚫 Введите корректное целое число.")
+            print("Введите корректное целое число.")
 
 def main():    
     
